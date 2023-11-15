@@ -5,7 +5,7 @@ interface Todo {
   $createdAt: string;
   title: string;
   status: TypedColumn;
-  image?: string;
+
 }
 interface Column {
   id: TypedColumn;
@@ -15,7 +15,3 @@ interface Board {
   columns: Map<TypedColumn, Column>;
 }
 
-interface Image {
-  bucketId: string;
-  fileId: string;
-}

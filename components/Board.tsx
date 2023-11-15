@@ -1,77 +1,82 @@
-'use client'
-import { useBearStore } from '@/store/BoardStore';
-import { useState, useEffect } from 'react'
+"use client";
+import { useBoardStore } from "@/store/BoardStore";
+import { useState, useEffect } from "react";
+import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
+import Column from "./Column";
 
+function Board() {
+  const [board, getBoard, setBoardState, updateTodoInDB] = useBoardStore((state) => [
+    state.board,
+    state.getBoard,
+    state.setBoardState,
+    state.updateTodoInDB,
+  ]);
+  useEffect(() => {
+    getBoard();
+  }, [getBoard]);
 
+  const handleOnDragEnd = (result: DropResult) => {
+    const { destination, source, type } = result;
+    if (!destination) return;
+    if (type === "column") {
+      const entries = Array.from(board.columns.entries());
+      const [removed] = entries.splice(source.index, 1);
+      entries.splice(destination.index, 0, removed);
+      const rearrangedColumns = new Map(entries);
+      setBoardState({ ...board, columns: rearrangedColumns });
+    }
 
-
-const Board : React.FC = () => {
-    const [board,getBoard] = useBearStore((state)=> [state.board,state.getBoard]);
-    useEffect(()=>{
-        getBoard();
-    },[getBoard])
-
-    board.columns.forEach((columnValue, columnName) => {
-      console.log(`Column Name: ${columnName}`);
-        console.log(columnValue); // This will be the object containing id and todos
-    
-        // Accessing the todos array within each column
-      const todosArray = columnValue.todos;
-       todosArray.forEach((todo) => {
-            console.log(todo); // Access individual todo items within the todos array
-            
-       });
-    });
-
-
-    const [tasks, setTasks] = useState<string[]>([]);
-    const [InProgressTasks, setInProgressTasks] = useState<string[]>([]);
-    const [doneTasks, setDoneTasks] = useState<string[]>([]);
-  
-    const onDragStart = (event: React.DragEvent<HTMLDivElement>, taskContent: string) => {
-        event.dataTransfer.setData('text/plain', taskContent);
-      };
-    
-      const onDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-        event.preventDefault();
-      };
-    
-      const onDrop = (event: React.DragEvent<HTMLDivElement>, section: string) => {
-        event.preventDefault();
-        const taskContent = event.dataTransfer.getData('text/plain');
-    
-        if (section === 'todo') {
-          setTasks((prevTasks) => prevTasks.filter((task) => task !== taskContent));
-        } else if (section === 'InProgress') {
-          setInProgressTasks((prevTasks) => [...prevTasks, taskContent]);
-        } else if (section === 'done') {
-          setDoneTasks((prevTasks) => [...prevTasks, taskContent]);
-        }
-      };
-      return (
-        <div className="flex flex-wrap justify-center">
-        {Array.from(board.columns).map(([columnName, columnValue], index, array) => (
-          <div key={columnValue.id} className={`w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 p-2 ${index < 3 ? 'w-full' : 'flex-grow'}`}>
-            <div className="p-5 border rounded-lg bg-gray-100">
-              <h2 className="text-lg font-semibold mb-2 text-gray-800">{columnName}</h2>
-              {columnValue.todos.map(todo => (
-                <div key={todo.$id} className="bg-white rounded-lg p-2 mb-2">
-                  <p className="text-gray-700">{todo.title}</p>
-                 
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      
-      
-      
-
-
-      
-      );
+    const columns = Array.from(board.columns);
+    const startColIndex = columns[Number(source.droppableId)];
+    const finishColIndex = columns[Number(destination.droppableId)];
+    const startCol: Column = {
+      id: startColIndex[0],
+      todos: startColIndex[1].todos,
     };
-    
-    export default Board;
+    const finishCol: Column = {
+      id: finishColIndex[0],
+      todos: finishColIndex[1].todos,
+    };
+    if (!startCol || !finishCol) return;
+    if (source.index === destination.index && startCol === finishCol) return;
+    const newTodos = startCol.todos;
+    const [todoMoved] = newTodos.splice(source.index, 1);
+    if (startCol.id === finishCol.id) {
+      newTodos.splice(destination.index, 0, todoMoved);
+      const newCol = { id: startCol.id, todos: newTodos };
+      const newColumns = new Map(board.columns);
+      newColumns.set(startCol.id, newCol);
+      setBoardState({ ...board, columns: newColumns });
+    } else {
+      const finishTodos = Array.from(finishCol.todos);
+      finishTodos.splice(destination.index, 0, todoMoved);
+      const newCol = { id: startCol.id, todos: newTodos };
+      const newColumns = new Map(board.columns);
+      newColumns.set(newCol.id, newCol);
+      newColumns.set(finishCol.id, { id: finishCol.id, todos: finishTodos });
+
+        updateTodoInDB(todoMoved,finishCol.id)
+
+      setBoardState({ ...board, columns: newColumns });
+    }
+  };
+  return (
+    <DragDropContext onDragEnd={handleOnDragEnd}>
+      <Droppable droppableId="board" direction="horizontal" type="column">
+        {(provided) => (
+          <div
+            className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-7xl mx-auto"
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+          >
+            {Array.from(board.columns.entries()).map(([id, column], index) => (
+              <Column key={id} id={id} todos={column.todos} index={index} />
+            ))}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+}
+
+export default Board;
