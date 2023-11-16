@@ -1,27 +1,34 @@
 import { PlusCircleIcon } from "@heroicons/react/20/solid";
-import React from "react";
+import React, { useState } from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 import TodoCard from "./TodoCard";
 import { useModalStore } from "@/store/ModalStore";
 import { useBoardStore } from "@/store/BoardStore";
+import {ArrowsUpDownIcon} from "@heroicons/react/20/solid";
 
-type Props = {
-  id: TypedColumn;
-  todos: Todo[];
-  index: number;
-};
 const idToColumnText: {
   [key in TypedColumn]: string;
 } = { todo: "To Do", InProgress: "In Progress", done: "Done" };
 
 const Column: React.FC<Props> = ({ id, todos, index }) => {
-    const [ setNewTaskType] = useBoardStore((state)=>[state.setNewTaskType])
+  
+  const [setNewTaskType] = useBoardStore((state) => [state.setNewTaskType]);
   const openModal = useModalStore((state) => state.openModal);
-  const handleAddTodo =()=>
-  {
-    setNewTaskType(id)
+  const [sortOnButtonClick, setSortOnButtonClick] = useState(false); // Toggle sorting on button click
+
+  const sortedTodos = sortOnButtonClick
+    ? [...todos].sort((a, b) => a.title.localeCompare(b.title))
+    : todos;
+
+  const handleSortButtonClick = () => {
+    setSortOnButtonClick(!sortOnButtonClick); // Toggle sorting flag
+  };
+
+  const handleAddTodo = () => {
+    setNewTaskType(id);
     openModal();
-  }
+  };
+
   return (
     <Draggable draggableId={id} index={index}>
       {(provided) => (
@@ -46,24 +53,29 @@ const Column: React.FC<Props> = ({ id, todos, index }) => {
                   </span>
                 </h2>
                 <div className="space-y-2">
-                  {todos.map((todo, index) => (
-                    <Draggable
-                      key={todo.$id}
-                      draggableId={todo.$id}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <TodoCard
-                          todo={todo}
-                          index={index}
-                          id={id}
-                          innerRef={provided.innerRef}
-                          draggableProps={provided.draggableProps}
-                          dragHandleProps={provided.dragHandleProps}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
+                  <button onClick={handleSortButtonClick}>
+                    <ArrowsUpDownIcon className="h-5 w-5" />
+                  </button>
+
+                  {(sortOnButtonClick ? sortedTodos : todos).map((todo, index) => (
+                   <Draggable
+                        key={todo.$id}
+                        draggableId={`${todo.$id}_${id}`} 
+                        index={index}
+                      >
+                        {(provided) => (
+                          <TodoCard
+                            todo={todo}
+                            index={index}
+                            id={id}
+                            innerRef={provided.innerRef}
+                            draggableProps={provided.draggableProps}
+                            dragHandleProps={provided.dragHandleProps}
+                          />
+                        )}
+                      </Draggable>
+                    )
+                  )}
                   {provided.placeholder}
                   <div className="flex items-end justify-end p-2">
                     <button
