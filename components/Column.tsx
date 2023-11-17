@@ -9,20 +9,24 @@ const idToColumnText: {
   [key in TypedColumn]: string;
 } = { todo: "To Do", InProgress: "In Progress", done: "Done" };
 
-const Column: React.FC<Props> = ({ id, todos, index }) => {
-  
+const Column: React.FC<Props> = ({ id, todos, index }) => 
+{
+  // State and store hooks
   const [setNewTaskType] = useBoardStore((state) => [state.setNewTaskType]);
   const openModal = useModalStore((state) => state.openModal);
   const [sortOnButtonClick, setSortOnButtonClick] = useState(false); // Toggle sorting on button click
 
+  // Sorting logic
   const sortedTodos = sortOnButtonClick
     ? [...todos].sort((a, b) => a.title.localeCompare(b.title))
     : todos;
 
+  // Toggle sort button
   const handleSortButtonClick = () => {
     setSortOnButtonClick(!sortOnButtonClick); // Toggle sorting flag
   };
 
+  // Handle adding a new todo
   const handleAddTodo = () => {
     setNewTaskType(id);
     openModal();
