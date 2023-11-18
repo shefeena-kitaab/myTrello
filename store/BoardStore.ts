@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getTodosGroupedByColumn } from "@/lib/getTodosGroupedByColumn";
+import { getTodosGroupedByColumn,getSortedTodosGroupedByColumn} from "@/lib/getTodosGroupedByColumn";
 import { database, storage } from "@/appwrite";
 
 import { ID } from "appwrite";
@@ -7,12 +7,17 @@ import { ID } from "appwrite";
 //useBoardStore is created as a store using Zustand's create function.
 export const useBoardStore = create<BoadState>((set, get) => ({
   board: { columns: new Map<TypedColumn, Column>() },
-
+ sboard:{ columns: new Map<TypedColumn, Column>() },
   //fetches the board data from an external source asynchronously and updates the application state.
   getBoard: async () => {
     //structured data of the task management board, organized by columns.
     const board = await getTodosGroupedByColumn();
     set({ board });
+  },
+  sortBoard: async () => {
+    const board = await getSortedTodosGroupedByColumn();
+    set({ board });
+
   },
   //setBoardState directly sets the board state synchronously based on the provided board parameter.
   setBoardState: (board) => set({ board }),

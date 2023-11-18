@@ -1,16 +1,18 @@
 "use client";
 import { useBoardStore } from "@/store/BoardStore";
-import {  useEffect } from "react";
+import { useEffect } from "react";
 import { DragDropContext, DropResult, Droppable } from "react-beautiful-dnd";
 import Column from "./Column";
 
 function Board() {
-  const [board, getBoard, setBoardState, updateTodoInDB] = useBoardStore((state) => [
-    state.board,
-    state.getBoard,
-    state.setBoardState,
-    state.updateTodoInDB,
-  ]);
+  const [board, getBoard, setBoardState, updateTodoInDB] = useBoardStore(
+    (state) => [
+      state.board,
+      state.getBoard,
+      state.setBoardState,
+      state.updateTodoInDB,
+    ]
+  );
   useEffect(() => {
     getBoard();
   }, [getBoard]);
@@ -55,7 +57,7 @@ function Board() {
       newColumns.set(newCol.id, newCol);
       newColumns.set(finishCol.id, { id: finishCol.id, todos: finishTodos });
 
-        updateTodoInDB(todoMoved,finishCol.id)
+      updateTodoInDB(todoMoved, finishCol.id);
 
       setBoardState({ ...board, columns: newColumns });
     }

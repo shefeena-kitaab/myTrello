@@ -1,32 +1,33 @@
-'use client'
-import { FormEvent } from 'react';
-import TaskTypeRadioGroup from './TaskTypeRadioGroup';
-import { useBoardStore } from '@/store/BoardStore';
-import { useModalStore } from '@/store/ModalStore';
+"use client";
+import { FormEvent } from "react";
+import TaskTypeRadioGroup from "./TaskTypeRadioGroup";
+import { useBoardStore } from "@/store/BoardStore";
+import { useModalStore } from "@/store/ModalStore";
 
 function Modal() {
-  const [addTask, newTaskInput, setNewTaskInput, newTaskType] = useBoardStore((state) => [
-    state.addTask,
+  const [addTask, newTaskInput, setNewTaskInput, newTaskType] = useBoardStore(
+    (state) => [
+      state.addTask,
 
-    state.newTaskInput,
-    state.setNewTaskInput,
-    state.newTaskType
-   
-  ]);
+      state.newTaskInput,
+      state.setNewTaskInput,
+      state.newTaskType,
+    ]
+  );
 
   const [isOpen, closeModal] = useModalStore((state) => [
     state.isOpen,
     state.closeModal,
   ]);
 
-  const handleSubmit =(e:FormEvent<HTMLFormElement>) =>{
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if(!newTaskInput) return;
+    if (!newTaskInput) return;
 
-    addTask(newTaskInput,newTaskType)
+    addTask(newTaskInput, newTaskType);
 
     closeModal();
-  }
+  };
 
   return (
     <>
@@ -34,29 +35,31 @@ function Modal() {
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-25">
           <div className="flex items-center justify-center min-h-full">
             <div className="w-full max-w-md transform transition-all rounded-2xl bg-white p-6">
-            <div className="flex justify-end">
-  {/* Close button */}
-  <button
-    onClick={() => closeModal()} 
-    className="flex items-center justify-center bg-gray-200 rounded-full w-8 h-8 text-gray-500 hover:text-gray-700 focus:outline-none"
-  >
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  className="h-3 w-3"
-  fill="none"
-  viewBox="0 0 24 24"
-  stroke="currentColor"
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth={2}
-    d="M6 18L18 6M6 6l12 12"
-  />
-</svg>
-  </button>
-</div>
-              <h3 className="text-lg font-medium leading-6 text-gray-900 pb-2">Add a Task</h3>
+              <div className="flex justify-end">
+                {/* Close button */}
+                <button
+                  onClick={() => closeModal()}
+                  className="flex items-center justify-center bg-gray-200 rounded-full w-8 h-8 text-gray-500 hover:text-gray-700 focus:outline-none"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <h3 className="text-lg font-medium leading-6 text-gray-900 pb-2">
+                Add a Task
+              </h3>
               <form onSubmit={handleSubmit}>
                 <div>
                   <input

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useBoardStore } from "@/store/BoardStore";
 
-
 const types: TaskType[] = [
   {
     id: "todo",
@@ -25,8 +24,12 @@ const types: TaskType[] = [
 
 function TaskTypeRadioGroup() {
   const defaultTaskType = useBoardStore((state) => state.newTaskType);
-  const [newTaskType, setNewTaskType] = useState<TypedColumn>(defaultTaskType || "todo");
-  const boardStoreSetNewTaskType = useBoardStore((state) => state.setNewTaskType);
+  const [newTaskType, setNewTaskType] = useState<TypedColumn>(
+    defaultTaskType || "todo"
+  );
+  const boardStoreSetNewTaskType = useBoardStore(
+    (state) => state.setNewTaskType
+  );
 
   useEffect(() => {
     boardStoreSetNewTaskType(newTaskType);
@@ -46,7 +49,9 @@ function TaskTypeRadioGroup() {
             <label
               key={type.id}
               className={`relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none ${
-                newTaskType === type.id ? `${type.color} bg-opacity-75 text-white` : "bg-white"
+                newTaskType === type.id
+                  ? `${type.color} bg-opacity-75 text-white`
+                  : "bg-white"
               }`}
             >
               <input
@@ -59,29 +64,37 @@ function TaskTypeRadioGroup() {
               />
               <div className="flex items-center w-full">
                 <div className="flex flex-col w-full">
-                  <p className={`font-medium ${newTaskType === type.id ? "text-white" : "text-gray-900"}`}>
+                  <p
+                    className={`font-medium ${
+                      newTaskType === type.id ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     {type.name}
                   </p>
-                  <span className={`text-sm ${newTaskType === type.id ? "text-white" : "text-gray-500"}`}>
+                  <span
+                    className={`text-sm ${
+                      newTaskType === type.id ? "text-white" : "text-gray-500"
+                    }`}
+                  >
                     {type.description}
                   </span>
                 </div>
                 {newTaskType === type.id && (
                   <div className="shrink-0 text-white">
                     <svg
-  xmlns="http://www.w3.org/2000/svg"
-  className="h-6 w-6"
-  fill="none"
-  viewBox="0 0 24 24"
-  stroke="currentColor"
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth={2}
-    d="M5 13l4 4L19 7"
-  />
-</svg>
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
                   </div>
                 )}
               </div>

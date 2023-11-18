@@ -45,6 +45,8 @@ interface ModelState {
 }
 interface BoadState {
   board: Board;
+  sboard: Board;
+
   getBoard: () => void;
   setBoardState: (board: Board) => void;
   updateTodoInDB: (todo: Todo, columnId: TypedColumn) => void;
@@ -54,4 +56,5 @@ interface BoadState {
   newTaskType: TypedColumn;
   setNewTaskType: (columnId: TypedColumn) => void;
   addTask: (todo: string, columnId: TypedColumn) => void;
+  sortBoard: ()=> void;
 }
